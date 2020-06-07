@@ -6,6 +6,8 @@ import Item from "./Item";
 
 const ItemList = (props) => {
   const [todoList, setTodoList] = useState(null);
+  const [doneList, setDoneList] = useState(null);
+  const doneFlag = props.toDoStatus;
 
   // firestoreから全データを取得してstateに格納する関数
   const getTodosFromFirestore = async () => {
@@ -24,6 +26,13 @@ const ItemList = (props) => {
       };
     });
     setTodoList(todoArray);
+    //実行済タスクのstateの作成
+    const doneArray = todoArray.filter((task) => {
+      // console.log(task);
+      return task.data.isDone == true;
+    });
+    // console.log(todoArray);
+    setDoneList(doneArray);
     return todoArray;
   };
 
@@ -34,17 +43,38 @@ const ItemList = (props) => {
 
   return (
     <div>
-      <InputForm getTodosFromFirestore={getTodosFromFirestore} />
-      <ul>
-        {todoList?.map((x, index) => (
-          <Item
-            key={index}
-            todo={x}
-            index={index}
-            getTodosFromFirestore={getTodosFromFirestore}
-          />
-        ))}
-      </ul>
+      {doneFlag == "none" ? (
+        <InputForm getTodosFromFirestore={getTodosFromFirestore} />
+      ) : (
+        <div>
+          <p>完了済みのタスク一覧</p>
+        </div>
+      )}
+      {doneFlag == "none" ? (
+        <ul>
+          {todoList?.map((x, index) => (
+            <Item
+              key={index}
+              todo={x}
+              index={index}
+              getTodosFromFirestore={getTodosFromFirestore}
+              doneFlag={doneFlag}
+            />
+          ))}
+        </ul>
+      ) : (
+        <ul>
+          {doneList?.map((x, index) => (
+            <Item
+              key={index}
+              todo={x}
+              index={index}
+              getTodosFromFirestore={getTodosFromFirestore}
+              doneFlag={doneFlag}
+            />
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

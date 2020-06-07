@@ -34,7 +34,7 @@ const InputForm = ({ getTodosFromFirestore }) => {
 
   return (
     <form action="">
-      <ul>
+      <ul style={{ listStyle: "none" }}>
         <li>
           <label htmlFor="todo">やること：</label>
           <input

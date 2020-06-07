@@ -2,7 +2,7 @@
 import React from "react";
 import firebase from "../firebase";
 
-const Item = ({ index, todo, getTodosFromFirestore }) => {
+const Item = ({ index, todo, getTodosFromFirestore, doneFlag }) => {
   // timestamp形式のデータをいい感じの形式に変換する関数
   const convertFromTimestampToDatetime = (timestamp) => {
     const _d = timestamp ? new Date(timestamp * 1000) : new Date();
@@ -51,20 +51,35 @@ const Item = ({ index, todo, getTodosFromFirestore }) => {
           updateDataOnFirestore("todos", todo.id, todo.data.isDone)
         }
       />
-      {/* ↓↓↓ 編集 ↓↓↓ */}
       <button
         value={todo.id}
         onClick={(e) => deleteDataOnFirestore("todos", todo.id)}
       >
         delete
       </button>
-      {!todo.data.isDone ? (
-        <div>
-          <p>
-            締め切り：{convertFromTimestampToDatetime(todo.data.limit.seconds)}
-          </p>
-          <p>やること：{todo.data.todo}</p>
-        </div>
+
+      {doneFlag == "none" && todo.data.isDone == false ? (
+        !todo.data.isDone ? (
+          <div>
+            <p>
+              締め切り：
+              {convertFromTimestampToDatetime(todo.data.limit.seconds)}
+            </p>
+            <p>やること：{todo.data.todo}</p>
+          </div>
+        ) : (
+          <div>
+            <p>
+              <del>
+                締め切り：
+                {convertFromTimestampToDatetime(todo.data.limit.seconds)}
+              </del>
+            </p>
+            <p>
+              <del>やること：{todo.data.todo}</del>
+            </p>
+          </div>
+        )
       ) : (
         <div>
           <p>
