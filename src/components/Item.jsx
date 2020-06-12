@@ -1,6 +1,7 @@
 // Item.jsx
 import React from "react";
 import firebase from "../firebase";
+import axios from "axios";
 
 const Item = ({ index, todo, getTodosFromFirestore, doneFlag }) => {
   // timestamp形式のデータをいい感じの形式に変換する関数
@@ -16,33 +17,51 @@ const Item = ({ index, todo, getTodosFromFirestore, doneFlag }) => {
   };
 
   // ↓追加 ドキュメントIDを指定してFirestoreのデータを更新する関数
+  //フロントのみ
+  // const updateDataOnFirestore = async (collectionName, documentId, isDone) => {
+  //   const updatedData = await firebase
+  //     .firestore()
+  //     .collection(collectionName)
+  //     .doc(documentId)
+  //     .update({
+  //       //isDoneがtrueかfalseか判断
+  //       isDone: isDone ? false : true,
+  //     });
+  //   getTodosFromFirestore();
+  //   return;
+  // };
+  //cloudFunction利用
   const updateDataOnFirestore = async (collectionName, documentId, isDone) => {
-    const updatedData = await firebase
-      .firestore()
-      .collection(collectionName)
-      .doc(documentId)
-      .update({
-        //isDoneがtrueかfalseか判断
-        isDone: isDone ? false : true,
-      });
+    const newData = { isDone: isDone ? false : true };
+    const requestUrl =
+      "https://FirebaseDeployをしたCliudFunctionURLのエンドポイント/api/";
+    const updatedData = await axios.put(`${requestUrl}${documentId}`, newData);
     getTodosFromFirestore();
-    return;
+    return updatedData;
   };
 
   // ↓追加 ドキュメントIDを指定してFirestoreのデータを削除する関数
+  //フロントのみ
+  // const deleteDataOnFirestore = async (collectionName, documentId) => {
+  //   const removedData = await firebase
+  //     .firestore()
+  //     .collection(collectionName)
+  //     .doc(documentId)
+  //     .delete();
+  //   getTodosFromFirestore();
+  //   return;
+  // };
+  //cloudFunction利用
   const deleteDataOnFirestore = async (collectionName, documentId) => {
-    const removedData = await firebase
-      .firestore()
-      .collection(collectionName)
-      .doc(documentId)
-      .delete();
+    const requestUrl =
+      "https://FirebaseDeployをしたCliudFunctionURLのエンドポイント/api/";
+    const removedData = await axios.delete(`${requestUrl}${documentId}`);
     getTodosFromFirestore();
-    return;
+    return removedData;
   };
 
   return (
     <li key={index} id={todo.id}>
-      {/* ↓↓↓ 編集 ↓↓↓ */}
       <input
         type="checkbox"
         value={todo.id}
@@ -63,7 +82,7 @@ const Item = ({ index, todo, getTodosFromFirestore, doneFlag }) => {
           <div>
             <p>
               締め切り：
-              {convertFromTimestampToDatetime(todo.data.limit.seconds)}
+              {convertFromTimestampToDatetime(todo.data.limit._seconds)}
             </p>
             <p>やること：{todo.data.todo}</p>
           </div>
@@ -72,7 +91,7 @@ const Item = ({ index, todo, getTodosFromFirestore, doneFlag }) => {
             <p>
               <del>
                 締め切り：
-                {convertFromTimestampToDatetime(todo.data.limit.seconds)}
+                {convertFromTimestampToDatetime(todo.data.limit._seconds)}
               </del>
             </p>
             <p>
@@ -85,7 +104,7 @@ const Item = ({ index, todo, getTodosFromFirestore, doneFlag }) => {
           <p>
             <del>
               締め切り：
-              {convertFromTimestampToDatetime(todo.data.limit.seconds)}
+              {convertFromTimestampToDatetime(todo.data.limit._seconds)}
             </del>
           </p>
           <p>

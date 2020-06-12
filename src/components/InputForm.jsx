@@ -2,17 +2,26 @@
 // state管理をimport
 import React, { useState } from "react";
 import firebase from "../firebase";
+import axios from "axios";
 
 const InputForm = ({ getTodosFromFirestore }) => {
   const [todo, setTodo] = useState("");
   const [limit, setLimit] = useState("");
 
   // Firestoreにデータを送信する関数
+  //フロントのみ
+  // const postDataToFirestore = async (collectionName, postData) => {
+  //   const addedData = await firebase
+  //     .firestore()
+  //     .collection(collectionName)
+  //     .add(postData);
+  //   return addedData;
+  // };
+  //cloudFunction利用
   const postDataToFirestore = async (collectionName, postData) => {
-    const addedData = await firebase
-      .firestore()
-      .collection(collectionName)
-      .add(postData);
+    const requestUrl =
+      "https://FirebaseDeployをしたCliudFunctionURLのエンドポイント/api/";
+    const addedData = await axios.post(requestUrl, postData);
     return addedData;
   };
 
